@@ -1,0 +1,63 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "description": "Shared Renovate preset for the HomeFlare fleet (taslabs-net). Consumed per-repo via extends: [\"github>taslabs-net/renovate-config\"].",
+  "extends": [
+    "config:recommended",
+    ":dependencyDashboard",
+    "helpers:pinGitHubActionDigests",
+    "docker:pinDigests",
+    ":pinDevDependencies"
+  ],
+  "timezone": "America/New_York",
+  "schedule": ["* * * * *"],
+  "prConcurrentLimit": 5,
+  "prHourlyLimit": 2,
+  "dependencyDashboard": true,
+  "labels": ["dependencies"],
+  "minimumReleaseAge": "3 days",
+  "platformAutomerge": true,
+  "automergeType": "pr",
+  "ignoreDeps": [],
+  "lockFileMaintenance": {
+    "enabled": true,
+    "automerge": true,
+    "schedule": ["before 6am on monday"]
+  },
+  "packageRules": [
+    {
+      "description": "@homeflare/* is owned by taslabs-net/homeflare-bumper; never propose it here, so the two never open competing PRs for one kit release.",
+      "matchPackageNames": ["@homeflare/**"],
+      "enabled": false
+    },
+    {
+      "description": "bun/npm: group minor+patch, automerge on green.",
+      "matchManagers": ["bun", "npm"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "groupName": "bun/npm non-major",
+      "groupSlug": "js-non-major",
+      "automerge": true
+    },
+    {
+      "description": "GitHub Actions: group minor+patch+digest, automerge on green.",
+      "matchManagers": ["github-actions"],
+      "matchUpdateTypes": ["minor", "patch", "digest", "pinDigest"],
+      "groupName": "github-actions non-major",
+      "groupSlug": "actions-non-major",
+      "automerge": true
+    },
+    {
+      "description": "Docker / Dockerfile / compose: group minor+patch+digest, automerge on green.",
+      "matchManagers": ["dockerfile", "docker-compose"],
+      "matchUpdateTypes": ["minor", "patch", "digest", "pinDigest"],
+      "groupName": "docker non-major",
+      "groupSlug": "docker-non-major",
+      "automerge": true
+    },
+    {
+      "description": "Majors are never automerged; they want reading.",
+      "matchUpdateTypes": ["major"],
+      "automerge": false,
+      "dependencyDashboardApproval": false
+    }
+  ]
+}
