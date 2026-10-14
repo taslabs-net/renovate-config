@@ -58,6 +58,18 @@
       "matchUpdateTypes": ["major"],
       "automerge": false,
       "dependencyDashboardApproval": false
+    },
+    {
+      "description": "vitest family moves as ONE group: vitest, @vitest/* and @cloudflare/vitest-pool-workers. Splitting them breaks peers (pool-workers pins vitest's major). Never automerged.",
+      "matchPackageNames": ["vitest", "@vitest/**", "@cloudflare/vitest-pool-workers"],
+      "groupName": "vitest",
+      "groupSlug": "vitest",
+      "automerge": false
+    },
+    {
+      "description": "Hold vitest + @vitest/* at the major @cloudflare/vitest-pool-workers supports (its peer is vitest ^4.1 as of 0.23.0). Raise this cap only when a pool-workers release widens its vitest peer range.",
+      "matchPackageNames": ["vitest", "@vitest/**"],
+      "allowedVersions": "<5.0.0"
     }
   ]
 }
