@@ -194,6 +194,13 @@
       "allowedVersions": "!/^2\\.0\\.4$/"
     },
     {
+      "description": "builds/caddy/go.mod is what xcaddy writes from builds/caddy/build.ts (Caddy stays at the measured 2.11.4). A module bump in that file is rewritten back and the check fails. Bump the catalog in build.ts instead.",
+      "matchRepositories": ["homeflare-builds"],
+      "matchManagers": ["gomod"],
+      "matchFileNames": ["builds/caddy/**"],
+      "enabled": false
+    },
+    {
       "description": "First-party kit. One group per repo, no release-age wait, and not held to the host's weekday-morning schedule. Automerges once required checks are green, including a major. This rule is last so it wins over the major ban. homeflare-bumper stays off (KIT_BUMP_ENABLED is not true) or the two bots open competing PRs.",
       "matchPackageNames": ["@homeflare/**"],
       "groupName": "homeflare kit",
