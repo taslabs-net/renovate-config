@@ -194,11 +194,12 @@
       "allowedVersions": "!/^2\\.0\\.4$/"
     },
     {
-      "description": "First-party kit. One group per repo, no release-age wait, automerge once required checks are green, including a major. This rule is last so it wins over the major ban. homeflare-bumper stays off (KIT_BUMP_ENABLED is not true) or the two bots open competing PRs.",
+      "description": "First-party kit. One group per repo, no release-age wait, and not held to the host's weekday-morning schedule. Automerges once required checks are green, including a major. This rule is last so it wins over the major ban. homeflare-bumper stays off (KIT_BUMP_ENABLED is not true) or the two bots open competing PRs.",
       "matchPackageNames": ["@homeflare/**"],
       "groupName": "homeflare kit",
       "groupSlug": "homeflare-kit",
       "minimumReleaseAge": null,
+      "schedule": ["at any time"],
       "automerge": true,
       "enabled": true
     }
