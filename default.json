@@ -23,6 +23,12 @@
     "automerge": true,
     "schedule": ["before 6am on monday"]
   },
+  "vulnerabilityAlerts": {
+    "description": "Security fix PRs from GitHub's Dependabot alerts (alerts stay on; Dependabot's own fix PRs are off). Renovate applies this block as a forced override, so a plain packageRule cannot regroup it: the shared branchTopic below keeps the vitest family on ONE branch, and the vitest <5 allowedVersions packageRule still applies because GitHub-alert rules only set matchCurrentVersion. osvVulnerabilityAlerts is deliberately NOT enabled: OSV fix rules force allowedVersions to the fixed version and would bypass the vitest cap.",
+    "enabled": true,
+    "labels": ["dependencies", "security"],
+    "branchTopic": "{{#if (or (equals depName 'vitest') (containsString depName '@vitest/') (equals depName '@cloudflare/vitest-pool-workers'))}}vitest-vulnerability{{else}}{{{datasource}}}-{{{depNameSanitized}}}-vulnerability{{/if}}"
+  },
   "packageRules": [
     {
       "description": "@homeflare/* is owned by taslabs-net/homeflare-bumper; never propose it here, so the two never open competing PRs for one kit release.",
