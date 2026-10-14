@@ -2,21 +2,16 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "description": "Shared Renovate preset for the HomeFlare fleet (taslabs-net). Consumed per-repo via extends: [\"github>taslabs-net/renovate-config\"].",
   "extends": [
-    "config:recommended",
-    ":dependencyDashboard",
-    "helpers:pinGitHubActionDigests",
-    "docker:pinDigests"
+    "config:best-practices",
+    "security:minimumReleaseAgePypi"
   ],
   "timezone": "America/New_York",
   "schedule": ["* * * * *"],
   "prConcurrentLimit": 5,
   "prHourlyLimit": 2,
-  "dependencyDashboard": true,
   "labels": ["dependencies"],
-  "minimumReleaseAge": "3 days",
   "platformAutomerge": true,
   "automergeType": "pr",
-  "ignoreDeps": [],
   "lockFileMaintenance": {
     "enabled": true,
     "automerge": true,
@@ -35,7 +30,7 @@
       "enabled": false
     },
     {
-      "description": "Do not pin bun/npm ranges to exact versions. :pinDevDependencies opened immortal PRs (recreated if closed), automerge stayed off, and renovate/artifacts failed, so the queue filled with pin PRs that could not land. GitHub Action and Docker digest pins stay.",
+      "description": "config:best-practices includes :pinDevDependencies. Those range pins were immortal, automerge stayed off, and renovate/artifacts failed, so the queue filled with pin PRs that could not land. Digest pins for GitHub Actions and Docker stay.",
       "matchManagers": ["bun", "npm"],
       "matchUpdateTypes": ["pin"],
       "enabled": false
