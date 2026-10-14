@@ -21,7 +21,8 @@ This repository is **public** because presets must be readable by the Renovate s
 ## What `default.json` does
 
 - Groups minor + patch per ecosystem: bun/npm, github-actions, docker/dockerfile.
-- Pins GitHub Action and Docker digests.
+- Pins GitHub Action and Docker digests. It does not pin bun/npm ranges. Those pin
+  PRs were immortal, could not automerge, and failed artifact updates, so they sat open.
 - Weekly lockfile maintenance (Monday before 06:00).
 - Dependency Dashboard issue enabled in every repo.
 - Automerges non-major updates once required checks are green; majors never automerge.
