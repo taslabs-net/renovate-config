@@ -113,6 +113,11 @@
       "automerge": false
     },
     {
+      "description": "HOLD: Bun runtime pinned to exactly 1.4.0 fleet-wide (Tim 2026-10-14). In Bun 1.4.2, a process that installs a SIGTERM or SIGINT handler exits 143 and its cleanup never runs, so seed and cleanup tests fail and pre-push hooks block. 1.4.0 is verified good. Covers packageManager, engines, setup-bun bun-version and the oven/bun image. @types/bun is type-only and is not held. Lift this only after a newer Bun passes homeflare-openbao's SIGINT/SIGTERM seed tests.",
+      "matchPackageNames": ["bun", "oven/bun", "oven-sh/bun"],
+      "allowedVersions": "1.4.0"
+    },
+    {
       "description": "Upstream tracker: vite and @vitejs/* move together, because @vitejs/plugin-react majors require a matching vite major (plugin-react 6 needs vite ^8). Grouped instead of held, so both move at once.",
       "matchPackageNames": ["vite", "@vitejs/**"],
       "groupName": "vite",
