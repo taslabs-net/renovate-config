@@ -1,6 +1,4 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": [
-    "local>taslabs-net/renovate-config"
-  ]
+  "extends": ["github>taslabs-net/renovate-config"]
 }
