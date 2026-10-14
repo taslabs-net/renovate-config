@@ -5,8 +5,7 @@
     "config:recommended",
     ":dependencyDashboard",
     "helpers:pinGitHubActionDigests",
-    "docker:pinDigests",
-    ":pinDevDependencies"
+    "docker:pinDigests"
   ],
   "timezone": "America/New_York",
   "schedule": ["* * * * *"],
@@ -33,6 +32,12 @@
     {
       "description": "@homeflare/* is owned by taslabs-net/homeflare-bumper; never propose it here, so the two never open competing PRs for one kit release.",
       "matchPackageNames": ["@homeflare/**"],
+      "enabled": false
+    },
+    {
+      "description": "Do not pin bun/npm ranges to exact versions. :pinDevDependencies opened immortal PRs (recreated if closed), automerge stayed off, and renovate/artifacts failed, so the queue filled with pin PRs that could not land. GitHub Action and Docker digest pins stay.",
+      "matchManagers": ["bun", "npm"],
+      "matchUpdateTypes": ["pin"],
       "enabled": false
     },
     {
