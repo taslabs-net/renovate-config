@@ -20,12 +20,20 @@ This repository is **public** because presets must be readable by the Renovate s
 
 ## What `default.json` does
 
-- Groups minor + patch per ecosystem: bun/npm, github-actions, docker/dockerfile.
-- Pins GitHub Action and Docker digests. It does not pin bun/npm ranges. Those pin
-  PRs were immortal, could not automerge, and failed artifact updates, so they sat open.
-- Weekly lockfile maintenance (Monday before 06:00).
-- Dependency Dashboard issue enabled in every repo.
-- Automerges non-major updates once required checks are green; majors never automerge.
+It extends Renovate 44's `config:best-practices` (recommended config, monorepo groups,
+replacements, workarounds, digest changelogs, config migration, abandonment warnings,
+Action and Docker digest pins, and a three-day npm release age that skips update types
+with no release timestamp). Python gets the same three-day age via
+`security:minimumReleaseAgePypi`. A global `minimumReleaseAge` is not set: applied to
+`pin`, `replacement`, and lockfile updates, that check never clears.
+
+One departure from `config:best-practices`: bun and npm range pins stay off.
+`:pinDevDependencies` opened immortal PRs, automerge stayed off, and the lockfile
+update failed, so those PRs accumulated.
+
+- Groups minor + patch per ecosystem: bun/npm, github-actions, docker/dockerfile, and
+  automerges them once required checks are green. Majors never automerge.
+- Weekly lockfile maintenance (Monday before 06:00) automerges.
 - `prConcurrentLimit: 5`, `prHourlyLimit: 2`, timezone `America/New_York`.
 - Schedule is "any time": the server's own cron decides when runs happen on the pool.
 - **Never proposes `@homeflare/*`.** `taslabs-net/homeflare-bumper` owns kit bumps; this stops
