@@ -12,6 +12,8 @@
   "labels": ["dependencies"],
   "platformAutomerge": true,
   "automergeType": "pr",
+  "rebaseWhen": "auto",
+  "prCreation": "not-pending",
   "lockFileMaintenance": {
     "enabled": true,
     "automerge": true,
@@ -20,6 +22,7 @@
   "vulnerabilityAlerts": {
     "description": "Security fix PRs from GitHub's Dependabot alerts (alerts stay on; Dependabot's own fix PRs are off). Renovate applies this block as a forced override, so a plain packageRule cannot regroup it: the shared branchTopic below keeps the vitest family on ONE branch, and the vitest <5 allowedVersions packageRule still applies because GitHub-alert rules only set matchCurrentVersion. osvVulnerabilityAlerts is deliberately NOT enabled: OSV fix rules force allowedVersions to the fixed version and would bypass the vitest cap.",
     "enabled": true,
+    "automerge": true,
     "labels": ["dependencies", "security"],
     "branchTopic": "{{#if (or (equals depName 'vitest') (containsString depName '@vitest/') (equals depName '@cloudflare/vitest-pool-workers'))}}vitest-vulnerability{{else}}{{{datasource}}}-{{{depNameSanitized}}}-vulnerability{{/if}}"
   },
@@ -60,7 +63,70 @@
       "automerge": true
     },
     {
-      "description": "Majors are never automerged; they want reading.",
+      "description": "Python: group minor+patch across the package managers the fleet uses, automerge on green.",
+      "matchManagers": ["pep621", "pip_requirements", "pip_setup", "poetry", "pipenv", "uv"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "groupName": "python non-major",
+      "groupSlug": "python-non-major",
+      "automerge": true
+    },
+    {
+      "description": "psycopg and psycopg-binary release together. Their own group, so a binary bump cannot land apart from the library.",
+      "matchPackageNames": ["psycopg", "psycopg-binary", "psycopg2", "psycopg2-binary"],
+      "groupName": "psycopg",
+      "groupSlug": "psycopg",
+      "automerge": true
+    },
+    {
+      "description": "Go modules: group minor+patch, automerge on green. A module xcaddy rewrites still fails its check and stays for a person.",
+      "matchManagers": ["gomod"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "groupName": "go non-major",
+      "groupSlug": "go-non-major",
+      "automerge": true
+    },
+    {
+      "description": "golang.org/x moves as one module family.",
+      "matchManagers": ["gomod"],
+      "matchPackageNames": ["golang.org/x/**"],
+      "groupName": "golang.org/x",
+      "groupSlug": "golang-x",
+      "automerge": true
+    },
+    {
+      "description": "google.golang.org, including grpc and genproto, moves as one module family.",
+      "matchManagers": ["gomod"],
+      "matchPackageNames": ["google.golang.org/**"],
+      "groupName": "google.golang.org",
+      "groupSlug": "google-golang",
+      "automerge": true
+    },
+    {
+      "description": "OpenTelemetry Go modules release together.",
+      "matchManagers": ["gomod"],
+      "matchPackageNames": ["go.opentelemetry.io/**"],
+      "groupName": "opentelemetry go",
+      "groupSlug": "otel-go",
+      "automerge": true
+    },
+    {
+      "description": "Caddy and its security handler. One group. xcaddy regenerates builds/caddy/go.mod, so a bump that does not match that output fails the check and is not automerged.",
+      "matchManagers": ["gomod"],
+      "matchPackageNames": ["github.com/caddyserver/**", "github.com/greenpau/caddy-security"],
+      "groupName": "caddy",
+      "groupSlug": "caddy",
+      "automerge": true
+    },
+    {
+      "description": "Model Context Protocol packages share one version train.",
+      "matchPackageNames": ["@modelcontextprotocol/**"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "groupName": "mcp",
+      "groupSlug": "mcp",
+      "automerge": true
+    },
+    {
+      "description": "Majors are never automerged; they want reading. A GitHub security alert is the exception: vulnerabilityAlerts.automerge lands it once required checks are green.",
       "matchUpdateTypes": ["major"],
       "automerge": false,
       "dependencyDashboardApproval": false
@@ -85,8 +151,8 @@
       "automerge": false
     },
     {
-      "description": "Upstream tracker: Cloudflare Workers toolchain. wrangler, miniflare, @cloudflare/workers-types and @cloudflare/vite-plugin move together. @cloudflare/vitest-pool-workers stays in the vitest group, which owns its peer cap.",
-      "matchPackageNames": ["wrangler", "miniflare", "@cloudflare/workers-types", "@cloudflare/vite-plugin"],
+      "description": "Upstream tracker: Cloudflare Workers toolchain. wrangler, miniflare, @cloudflare/workers-types, @cloudflare/workers-oauth-provider and @cloudflare/vite-plugin move together. @cloudflare/vitest-pool-workers stays in the vitest group, which owns its peer cap.",
+      "matchPackageNames": ["wrangler", "miniflare", "@cloudflare/workers-types", "@cloudflare/workers-oauth-provider", "@cloudflare/vite-plugin"],
       "groupName": "cloudflare workers toolchain",
       "groupSlug": "cloudflare-workers",
       "automerge": false
