@@ -31,8 +31,14 @@ One departure from `config:best-practices`: bun and npm range pins stay off.
 `:pinDevDependencies` opened immortal PRs, automerge stayed off, and the lockfile
 update failed, so those PRs accumulated.
 
-- Groups minor + patch per ecosystem: bun/npm, github-actions, docker/dockerfile, and
-  automerges them once required checks are green. Majors never automerge.
+- Rebases a branch when it falls behind or conflicts (`rebaseWhen: auto`), unless a
+  person has pushed commits to it. A pull is not opened until its release-age wait is
+  over (`prCreation: not-pending`), so those waits do not fill the five-PR cap.
+- Groups minor + patch and automerges on green: bun/npm, GitHub Actions, Docker,
+  Python, Go, `golang.org/x`, `google.golang.org`, OpenTelemetry Go, Caddy, and
+  `@modelcontextprotocol/*`. psycopg and psycopg-binary are their own group.
+- A GitHub security alert automerges once required checks are green, including a major.
+  Any other major waits.
 - Weekly lockfile maintenance (Monday before 06:00) automerges.
 - `prConcurrentLimit: 5`, `prHourlyLimit: 2`, timezone `America/New_York`.
 - Schedule is "any time": the server's own cron decides when runs happen on the pool.
