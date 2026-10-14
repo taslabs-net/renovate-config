@@ -76,6 +76,56 @@
       "description": "Hold vitest + @vitest/* at the major @cloudflare/vitest-pool-workers supports (its peer is vitest ^4.1 as of 0.23.0). Raise this cap only when a pool-workers release widens its vitest peer range.",
       "matchPackageNames": ["vitest", "@vitest/**"],
       "allowedVersions": "<5.0.0"
+    },
+    {
+      "description": "Upstream tracker: Payload CMS. payload and @payloadcms/* release in lockstep (the estate runs the 4.0 canary line), so they move as ONE group; never automerged.",
+      "matchPackageNames": ["payload", "@payloadcms/**"],
+      "groupName": "payload",
+      "groupSlug": "payload",
+      "automerge": false
+    },
+    {
+      "description": "Upstream tracker: Cloudflare Workers toolchain. wrangler, miniflare, @cloudflare/workers-types and @cloudflare/vite-plugin move together. @cloudflare/vitest-pool-workers stays in the vitest group, which owns its peer cap.",
+      "matchPackageNames": ["wrangler", "miniflare", "@cloudflare/workers-types", "@cloudflare/vite-plugin"],
+      "groupName": "cloudflare workers toolchain",
+      "groupSlug": "cloudflare-workers",
+      "automerge": false
+    },
+    {
+      "description": "Upstream tracker: Alchemy (the estate runs the 2.0 beta line) and its distilled SDKs. One group, never automerged: a beta bump can change resource behaviour.",
+      "matchPackageNames": ["alchemy", "@alchemy/**", "@distilled.cloud/**"],
+      "groupName": "alchemy",
+      "groupSlug": "alchemy",
+      "automerge": false
+    },
+    {
+      "description": "Upstream tracker: Effect. effect and @effect/* share one version train; split bumps break peers.",
+      "matchPackageNames": ["effect", "@effect/**"],
+      "groupName": "effect",
+      "groupSlug": "effect",
+      "automerge": false
+    },
+    {
+      "description": "Upstream tracker: Bun runtime and its types (npm, packageManager/engines, and the oven/bun image) move as one.",
+      "matchPackageNames": ["bun", "@types/bun", "bun-types", "oven/bun"],
+      "groupName": "bun",
+      "groupSlug": "bun",
+      "automerge": false
+    },
+    {
+      "description": "Upstream tracker: vite and @vitejs/* move together, because @vitejs/plugin-react majors require a matching vite major (plugin-react 6 needs vite ^8). Grouped instead of held, so both move at once.",
+      "matchPackageNames": ["vite", "@vitejs/**"],
+      "groupName": "vite",
+      "groupSlug": "vite",
+      "automerge": false
+    },
+    {
+      "description": "Upstream tracker: Flue. @flue/* move as one group. Excludes 2.0.4 only, a known broken publish (homeflare pnpm-workspace.yaml); every other version is allowed.",
+      "matchPackageNames": ["@flue/**"],
+      "groupName": "flue",
+      "groupSlug": "flue",
+      "automerge": false,
+      "allowedVersions": "!/^2\\.0\\.4$/"
     }
   ]
 }
