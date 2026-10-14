@@ -42,5 +42,6 @@ update failed, so those PRs accumulated.
 - Weekly lockfile maintenance (Monday before 06:00) automerges.
 - `prConcurrentLimit: 5`, `prHourlyLimit: 2`, timezone `America/New_York`.
 - Schedule is "any time": the server's own cron decides when runs happen on the pool.
-- **Never proposes `@homeflare/*`.** `taslabs-net/homeflare-bumper` owns kit bumps; this stops
-  two bots opening competing PRs for one release.
+- **`@homeflare/*` is one group, with no release-age wait, and it automerges on green,**
+  including a major. A red check is the exception and stays open. `homeflare-bumper` must
+  stay off (`KIT_BUMP_ENABLED` not `true`) so it does not open a second pull for the same release.
