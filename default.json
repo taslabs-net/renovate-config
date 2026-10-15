@@ -146,11 +146,10 @@
       "automerge": false
     },
     {
-      "description": "Upstream tracker: Cloudflare Workers toolchain. wrangler, miniflare, @cloudflare/workers-types, @cloudflare/workers-oauth-provider and @cloudflare/vite-plugin move together. @cloudflare/vitest-pool-workers stays in the vitest group, which owns its peer cap.",
+      "description": "Upstream tracker: Cloudflare Workers toolchain. wrangler, miniflare, @cloudflare/workers-types, @cloudflare/workers-oauth-provider and @cloudflare/vite-plugin move together. @cloudflare/vitest-pool-workers stays in the vitest group, which owns its peer cap. A non-major automerges once checks are green. A major stays a pull request.",
       "matchPackageNames": ["wrangler", "miniflare", "@cloudflare/workers-types", "@cloudflare/workers-oauth-provider", "@cloudflare/vite-plugin"],
       "groupName": "cloudflare workers toolchain",
-      "groupSlug": "cloudflare-workers",
-      "automerge": false
+      "groupSlug": "cloudflare-workers"
     },
     {
       "description": "Upstream tracker: Alchemy (the estate runs the 2.0 beta line) and its distilled SDKs. One group, never automerged: a beta bump can change resource behaviour.",
@@ -160,11 +159,10 @@
       "automerge": false
     },
     {
-      "description": "Upstream tracker: Effect. effect and @effect/* share one version train; split bumps break peers.",
+      "description": "Upstream tracker: Effect. effect and @effect/* share one version train; split bumps break peers. A non-major in this group automerges once checks are green. A major stays a pull request.",
       "matchPackageNames": ["effect", "@effect/**"],
       "groupName": "effect",
-      "groupSlug": "effect",
-      "automerge": false
+      "groupSlug": "effect"
     },
     {
       "description": "Upstream tracker: Bun runtime and its types (npm, packageManager/engines, and the oven/bun image) move as one.",
@@ -179,18 +177,16 @@
       "allowedVersions": "1.4.0"
     },
     {
-      "description": "Upstream tracker: vite and @vitejs/* move together, because @vitejs/plugin-react majors require a matching vite major (plugin-react 6 needs vite ^8). Grouped instead of held, so both move at once.",
+      "description": "Upstream tracker: vite and @vitejs/* move together, because @vitejs/plugin-react majors require a matching vite major (plugin-react 6 needs vite ^8). Grouped instead of held, so both move at once. A non-major automerges once checks are green. A major stays a pull request.",
       "matchPackageNames": ["vite", "@vitejs/**"],
       "groupName": "vite",
-      "groupSlug": "vite",
-      "automerge": false
+      "groupSlug": "vite"
     },
     {
-      "description": "Upstream tracker: Flue. @flue/* move as one group. Excludes 2.0.4 only, a known broken publish (homeflare pnpm-workspace.yaml); every other version is allowed.",
+      "description": "Upstream tracker: Flue. @flue/* move as one group. Excludes 2.0.4 only, a known broken publish (homeflare pnpm-workspace.yaml); every other version is allowed. A non-major automerges once checks are green. A major stays a pull request.",
       "matchPackageNames": ["@flue/**"],
       "groupName": "flue",
       "groupSlug": "flue",
-      "automerge": false,
       "allowedVersions": "!/^2\\.0\\.4$/"
     },
     {
@@ -226,6 +222,18 @@
           ".github/workflows/ci.yml",
           ".github/workflows/security.yml"
         ],
+        "executionMode": "branch"
+      }
+    },
+    {
+      "description": "homeflare-kit publishes exact dependency versions that must equal the root catalog. After a bump, copy those versions into catalog. The command string is RENOVATE_CATALOG_SYNC in homeflare-mini; the admin allowlist matches it and nothing else. A repo with no catalog exits 0.",
+      "matchRepositories": ["homeflare-kit"],
+      "matchManagers": ["bun", "npm"],
+      "postUpgradeTasks": {
+        "commands": [
+          "node --eval 'const fs=require(\"fs\");const text0=fs.readFileSync(\"package.json\",\"utf8\");const root=JSON.parse(text0);if(!root.catalog)process.exit(0);let text=text0;for(const dir of fs.readdirSync(\"packages\")){const path=\"packages/\"+dir+\"/package.json\";if(!fs.existsSync(path))continue;const deps=JSON.parse(fs.readFileSync(path,\"utf8\")).dependencies||{};for(const [name,version] of Object.entries(deps)){if(!(name in root.catalog))continue;if(typeof version!==\"string\"||version.startsWith(\"workspace:\")||version.startsWith(\"catalog:\"))continue;if(root.catalog[name]===version)continue;const from=JSON.stringify(name)+\": \"+JSON.stringify(root.catalog[name]);const to=JSON.stringify(name)+\": \"+JSON.stringify(version);if(!text.includes(from))process.exit(1);text=text.split(from).join(to);root.catalog[name]=version}}if(text!==text0)fs.writeFileSync(\"package.json\",text)'"
+        ],
+        "fileFilters": ["package.json"],
         "executionMode": "branch"
       }
     }
