@@ -201,7 +201,7 @@
       "enabled": false
     },
     {
-      "description": "First-party kit. One group per repo, no release-age wait, and not held to the host's weekday-morning schedule. Automerges once required checks are green, including a major. This rule is last so it wins over the major ban. homeflare-bumper stays off (KIT_BUMP_ENABLED is not true) or the two bots open competing PRs.",
+      "description": "First-party kit. One group per repo, no release-age wait, and not held to the host's weekday-morning schedule. Automerges once required checks are green, including a major. This rule wins the major ban. The @homeflare/config refresh rule after it does not set automerge. homeflare-bumper stays off (KIT_BUMP_ENABLED is not true) or the two bots open competing PRs.",
       "matchPackageNames": ["@homeflare/**"],
       "groupName": "homeflare kit",
       "groupSlug": "homeflare-kit",
@@ -209,6 +209,25 @@
       "schedule": ["at any time"],
       "automerge": true,
       "enabled": true
+    },
+    {
+      "description": "After @homeflare/config is bumped, install that lockfile and refresh the rendered repo shape in the same commit. The command string is RENOVATE_REPO_SHAPE_REFRESH in homeflare-mini; the admin allowlist matches it and nothing else. A repo with no repo-shape:refresh script exits 0. This rule does not set automerge, so the kit rule above still wins the major ban.",
+      "matchPackageNames": [
+        "@homeflare/config"
+      ],
+      "postUpgradeTasks": {
+        "commands": [
+          "node --eval 'const p=require(\"./package.json\");if(!p.scripts||!p.scripts[\"repo-shape:refresh\"])process.exit(0);const {spawnSync}=require(\"node:child_process\");for(const args of [[\"install\",\"--frozen-lockfile\"],[\"run\",\"repo-shape:refresh\"]]){const r=spawnSync(\"bun\",args,{stdio:\"inherit\"});if(r.status!==0)process.exit(r.status??1)}'"
+        ],
+        "fileFilters": [
+          ".changeset/config.json",
+          ".github/actionlint.yaml",
+          ".github/dependabot.yml",
+          ".github/workflows/ci.yml",
+          ".github/workflows/security.yml"
+        ],
+        "executionMode": "branch"
+      }
     }
   ]
 }
