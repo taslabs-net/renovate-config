@@ -176,6 +176,7 @@
     {
       "description": "HOLD: effect pinned to exactly 4.0.3 fleet-wide (the effect resolution alchemy 2.0.0-beta.81's anchors were verified against — landscape scripts/deploy-approve/env.ts VERIFIED_EFFECT_VERSIONS). 4.0.4+ changes Effect's requirements type parameter so `Effect<A, E, any>` no longer assigns to `Effect<A, E, never>`, which fails `tsc` in homeflare-landscape (scripts/memory/api.ts, scripts/seats/bundles/sdk-port.ts) and would fail deploy-approve's effect-layer check. Lift only after a newer effect passes the effect-layer review and VERIFIED_EFFECT_VERSIONS gains that resolution.",
       "matchPackageNames": ["effect", "@effect/**"],
+      "matchCurrentVersion": "/^4\\./",
       "allowedVersions": "4.0.3"
     },
     {
