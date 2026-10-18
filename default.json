@@ -205,8 +205,8 @@
       "allowedVersions": "!/^2\\.0\\.4$/"
     },
     {
-      "description": "builds/caddy/go.mod is what xcaddy writes from builds/caddy/build.ts (Caddy stays at the measured 2.11.4). A module bump in that file is rewritten back and the check fails. Bump the catalog in build.ts instead.",
-      "matchRepositories": ["homeflare-builds"],
+      "description": "builds/caddy/go.mod is what xcaddy writes from builds/caddy/build.ts (Caddy stays at the measured 2.11.4). A module bump in that file is rewritten back and the check fails. Bump the catalog in build.ts instead. matchRepositories matches the FULL repository name (taslabs-net/homeflare-builds), never the bare name.",
+      "matchRepositories": ["taslabs-net/homeflare-builds"],
       "matchManagers": ["gomod"],
       "matchFileNames": ["builds/caddy/**"],
       "enabled": false
@@ -239,20 +239,22 @@
       }
     },
     {
-      "description": "HOLD the @homeflare/config bump for repos whose repo-shape is not yet conformant, so Renovate stops opening doomed red PRs. Two measured classes: (a) not adopted onto repo-shape at all (no repo-shape.ts, so the postUpgradeTask above exits 0 and the 0.27.0 drift checks cannot auto-fix) — homeflare-aimto, homeflare-memory, homeflare-secrets; (b) adopted but their repo-shape.ts still declares runner: 'mini', which 0.22.0 retired for every repo but homeflare-mini (resolveRunner throws, so repo-shape:refresh cannot run) — homeflare-openbao-plugins, homeflare-subnet-calc. Remove a repo from this list only in the same change that lands its repo-shape adoption (author repo-shape.ts + repo-shape:refresh, or retype runner to the 'pool' default); adoption is the repo-shape lane's authored work, not Renovate's.",
+      "description": "HOLD the @homeflare/config minor bump for repos whose repo-shape is not yet conformant, so Renovate stops opening doomed red PRs. Two measured classes: (a) not adopted onto repo-shape at all (no repo-shape.ts, so the postUpgradeTask above exits 0 and the 0.27.0 drift checks cannot auto-fix) — taslabs-net/homeflare-aimto, homeflare-memory, homeflare-secrets; (b) adopted but their repo-shape.ts still declares runner: 'mini', which 0.22.0 retired for every repo but homeflare-mini (resolveRunner throws, so repo-shape:refresh cannot run) — taslabs-net/homeflare-openbao-plugins, homeflare-subnet-calc. matchRepositories matches the FULL repository name (e.g. taslabs-net/homeflare-aimto), never the bare name. Scoped to the minor line below 0.27.0 so a future release that fixes repo-shape adoption (or a major) is not silently blocked: once a repo lands its repo-shape adoption (author repo-shape.ts + repo-shape:refresh, or retype runner to the 'pool' default), remove it from this list in that same change. Adoption is the repo-shape lane's authored work, not Renovate's.",
       "matchRepositories": [
-        "homeflare-aimto",
-        "homeflare-memory",
-        "homeflare-secrets",
-        "homeflare-openbao-plugins",
-        "homeflare-subnet-calc"
+        "taslabs-net/homeflare-aimto",
+        "taslabs-net/homeflare-memory",
+        "taslabs-net/homeflare-secrets",
+        "taslabs-net/homeflare-openbao-plugins",
+        "taslabs-net/homeflare-subnet-calc"
       ],
       "matchPackageNames": ["@homeflare/config"],
+      "matchCurrentVersion": "<0.27.0",
+      "matchUpdateTypes": ["minor"],
       "enabled": false
     },
     {
-      "description": "homeflare-kit publishes exact dependency versions that must equal the root catalog. After a bump, copy those versions into catalog. The command string is RENOVATE_CATALOG_SYNC in homeflare-mini; the admin allowlist matches it and nothing else. A repo with no catalog exits 0.",
-      "matchRepositories": ["homeflare-kit"],
+      "description": "homeflare-kit publishes exact dependency versions that must equal the root catalog. After a bump, copy those versions into catalog. The command string is RENOVATE_CATALOG_SYNC in homeflare-mini; the admin allowlist matches it and nothing else. A repo with no catalog exits 0. matchRepositories matches the FULL repository name (taslabs-net/homeflare-kit), never the bare name.",
+      "matchRepositories": ["taslabs-net/homeflare-kit"],
       "matchManagers": ["bun", "npm"],
       "postUpgradeTasks": {
         "commands": [
