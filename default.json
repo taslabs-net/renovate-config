@@ -1,10 +1,7 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "description": "Shared Renovate preset for the HomeFlare fleet (taslabs-net). Consumed per-repo via extends: [\"github>taslabs-net/renovate-config\"].",
-  "extends": [
-    "config:best-practices",
-    "security:minimumReleaseAgePypi"
-  ],
+  "extends": ["config:best-practices", "security:minimumReleaseAgePypi"],
   "timezone": "America/New_York",
   "schedule": ["* * * * *"],
   "prConcurrentLimit": 5,
@@ -153,7 +150,13 @@
     },
     {
       "description": "Upstream tracker: Cloudflare Workers toolchain. wrangler, miniflare, @cloudflare/workers-types, @cloudflare/workers-oauth-provider and @cloudflare/vite-plugin move together. @cloudflare/vitest-pool-workers stays in the vitest group, which owns its peer cap. A non-major automerges once checks are green. A major stays a pull request.",
-      "matchPackageNames": ["wrangler", "miniflare", "@cloudflare/workers-types", "@cloudflare/workers-oauth-provider", "@cloudflare/vite-plugin"],
+      "matchPackageNames": [
+        "wrangler",
+        "miniflare",
+        "@cloudflare/workers-types",
+        "@cloudflare/workers-oauth-provider",
+        "@cloudflare/vite-plugin"
+      ],
       "groupName": "cloudflare workers toolchain",
       "groupSlug": "cloudflare-workers"
     },
@@ -169,6 +172,12 @@
       "matchPackageNames": ["effect", "@effect/**"],
       "groupName": "effect",
       "groupSlug": "effect"
+    },
+    {
+      "description": "HOLD: effect pinned to exactly 4.0.3 fleet-wide (the effect resolution alchemy 2.0.0-beta.81's anchors were verified against — landscape scripts/deploy-approve/env.ts VERIFIED_EFFECT_VERSIONS). 4.0.4+ changes Effect's requirements type parameter so `Effect<A, E, any>` no longer assigns to `Effect<A, E, never>`, which fails `tsc` in homeflare-landscape (scripts/memory/api.ts, scripts/seats/bundles/sdk-port.ts) and would fail deploy-approve's effect-layer check. Lift only after a newer effect passes the effect-layer review and VERIFIED_EFFECT_VERSIONS gains that resolution.",
+      "matchPackageNames": ["effect", "@effect/**"],
+      "matchCurrentVersion": "/^4\\./",
+      "allowedVersions": "4.0.3"
     },
     {
       "description": "Upstream tracker: Bun runtime and its types (npm, packageManager/engines, and the oven/bun image) move as one.",
@@ -214,9 +223,7 @@
     },
     {
       "description": "After @homeflare/config is bumped, install that lockfile and refresh the rendered repo shape in the same commit. The command string is RENOVATE_REPO_SHAPE_REFRESH in homeflare-mini; the admin allowlist matches it and nothing else. A repo with no repo-shape:refresh script exits 0. This rule does not set automerge, so the kit rule above still wins the major ban.",
-      "matchPackageNames": [
-        "@homeflare/config"
-      ],
+      "matchPackageNames": ["@homeflare/config"],
       "postUpgradeTasks": {
         "commands": [
           "node --eval 'const p=require(\"./package.json\");if(!p.scripts||!p.scripts[\"repo-shape:refresh\"])process.exit(0);const {spawnSync}=require(\"node:child_process\");for(const args of [[\"install\",\"--frozen-lockfile\"],[\"run\",\"repo-shape:refresh\"]]){const r=spawnSync(\"bun\",args,{stdio:\"inherit\"});if(r.status!==0)process.exit(r.status??1)}'"
