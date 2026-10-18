@@ -28,9 +28,15 @@
   },
   "packageRules": [
     {
-      "description": "config:best-practices includes :pinDevDependencies. Those range pins were immortal, automerge stayed off, and renovate/artifacts failed, so the queue filled with pin PRs that could not land. Digest pins for GitHub Actions and Docker stay.",
+      "description": "config:best-practices includes :pinDevDependencies. Those range pins were immortal, automerge stayed off, and renovate/artifacts failed, so the queue filled with pin PRs that could not land. Digest pins for Docker stay.",
       "matchManagers": ["bun", "npm"],
       "matchUpdateTypes": ["pin"],
+      "enabled": false
+    },
+    {
+      "description": "GitHub Actions digest pins stay off: .github/workflows/* is rendered by @homeflare/config's repo-shape (the fleet-wide pin point), so a pinDigest edit lands in generated files and fails the repo-shape drift test. Bump the action reference in @homeflare/config instead.",
+      "matchManagers": ["github-actions"],
+      "matchUpdateTypes": ["pinDigest", "pin"],
       "enabled": false
     },
     {
@@ -44,7 +50,7 @@
     {
       "description": "GitHub Actions: group minor+patch+digest, automerge on green.",
       "matchManagers": ["github-actions"],
-      "matchUpdateTypes": ["minor", "patch", "digest", "pinDigest"],
+      "matchUpdateTypes": ["minor", "patch", "digest"],
       "groupName": "github-actions non-major",
       "groupSlug": "actions-non-major",
       "automerge": true

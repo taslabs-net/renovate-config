@@ -27,9 +27,14 @@ with no release timestamp). Python gets the same three-day age via
 `security:minimumReleaseAgePypi`. A global `minimumReleaseAge` is not set: applied to
 `pin`, `replacement`, and lockfile updates, that check never clears.
 
-One departure from `config:best-practices`: bun and npm range pins stay off.
-`:pinDevDependencies` opened immortal PRs, automerge stayed off, and the lockfile
-update failed, so those PRs accumulated.
+Two departures from `config:best-practices`:
+
+- Bun and npm range pins stay off. `:pinDevDependencies` opened immortal PRs,
+  automerge stayed off, and the lockfile update failed, so those PRs accumulated.
+- GitHub Actions digest pins stay off. `.github/workflows/*` is rendered by
+  `@homeflare/config`'s repo-shape (the fleet-wide pin point), so a `pinDigest`
+  edit lands in generated files and fails the repo-shape drift test. Action
+  references are bumped in `@homeflare/config` instead.
 
 - Rebases a branch when it falls behind or conflicts (`rebaseWhen: auto`), unless a
   person has pushed commits to it. A pull is not opened until its release-age wait is
