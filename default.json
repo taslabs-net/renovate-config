@@ -161,17 +161,17 @@
       "groupSlug": "cloudflare-workers"
     },
     {
-      "description": "Upstream tracker: Alchemy (the estate runs the 2.0 beta line) and its distilled SDKs. One group, never automerged: a beta bump can change resource behaviour.",
-      "matchPackageNames": ["alchemy", "@alchemy/**", "@distilled.cloud/**"],
-      "groupName": "alchemy",
-      "groupSlug": "alchemy",
+      "description": "Upstream tracker: alchemy + Effect move as ONE group, ONE pull request. deploy-approve verifies the pair - landscape scripts/deploy-approve/env.ts VERIFIED_EFFECT_VERSIONS maps each alchemy beta to the effect resolution its anchors were verified against (beta.79 -> 4.0.0-rc.115, beta.81 -> 4.0.3; the effect HOLD after this rule pins the verified 4.0.3) - so a bump that splits the family ships a combination nothing verified. @distilled.cloud/** rides along because alchemy betas pin its core line. Never automerged, including effect non-majors (which automerged on green before this merge): every bump changes the verified pair and wants a person's read.",
+      "matchPackageNames": [
+        "alchemy",
+        "@alchemy/**",
+        "@distilled.cloud/**",
+        "effect",
+        "@effect/**"
+      ],
+      "groupName": "alchemy + effect",
+      "groupSlug": "alchemy-effect",
       "automerge": false
-    },
-    {
-      "description": "Upstream tracker: Effect. effect and @effect/* share one version train; split bumps break peers. A non-major in this group automerges once checks are green. A major stays a pull request.",
-      "matchPackageNames": ["effect", "@effect/**"],
-      "groupName": "effect",
-      "groupSlug": "effect"
     },
     {
       "description": "HOLD: effect pinned to exactly 4.0.3 fleet-wide (the effect resolution alchemy 2.0.0-beta.81's anchors were verified against — landscape scripts/deploy-approve/env.ts VERIFIED_EFFECT_VERSIONS). 4.0.4+ changes Effect's requirements type parameter so `Effect<A, E, any>` no longer assigns to `Effect<A, E, never>`, which fails `tsc` in homeflare-landscape (scripts/memory/api.ts, scripts/seats/bundles/sdk-port.ts) and would fail deploy-approve's effect-layer check. Lift only after a newer effect passes the effect-layer review and VERIFIED_EFFECT_VERSIONS gains that resolution.",

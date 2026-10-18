@@ -42,6 +42,11 @@ Two departures from `config:best-practices`:
 - Groups minor + patch and automerges on green: bun/npm, GitHub Actions, Docker,
   Python, Go, `golang.org/x`, `google.golang.org`, OpenTelemetry Go, Caddy, and
   `@modelcontextprotocol/*`. psycopg and psycopg-binary are their own group.
+- **alchemy + Effect move as ONE pull request, never automerged.** deploy-approve
+  verifies the pair - each alchemy beta is mapped to the effect resolution its anchors
+  were verified against (landscape `scripts/deploy-approve/env.ts`), so a bump that
+  splits the family ships a combination nothing verified. The effect HOLD pins the
+  verified 4.0.3.
 - A GitHub security alert automerges once required checks are green, including a major.
   Any other major waits.
 - Weekly lockfile maintenance (Monday before 06:00) automerges.
