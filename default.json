@@ -180,6 +180,11 @@
       "allowedVersions": "4.0.3"
     },
     {
+      "description": "HOLD: @homeflare/distilled-litellm pinned below 0.4.0 while effect stays held at 4.0.3. The kit's 0.4.x line pulls @distilled.cloud/core@1.0.0-rc.13 whose peer is `effect: ^4.0.0` (a range, not the 4.0.1 the SDK itself declares); that transitive resolution widens effect to 4.0.4+ past the verified 4.0.3 anchor, and 4.0.4+ fails `tsc` in homeflare-landscape (`Effect<A, E, any>` no longer assigns to `Effect<A, E, never>`) — this is landscape #401. The effect HOLD rule only pins the direct effect/@effect deps, so it cannot stop a distilled-litellm bump from widening effect through core's peer range. Lift only when a newer distilled-litellm either declares a verified effect resolution or the effect HOLD is lifted together with it (same change).",
+      "matchPackageNames": ["@homeflare/distilled-litellm"],
+      "allowedVersions": "<0.4.0"
+    },
+    {
       "description": "Upstream tracker: Bun runtime and its types (npm, packageManager/engines, and the oven/bun image) move as one.",
       "matchPackageNames": ["bun", "@types/bun", "bun-types", "oven/bun"],
       "groupName": "bun",
