@@ -249,6 +249,12 @@
         "fileFilters": ["package.json"],
         "executionMode": "branch"
       }
+    },
+    {
+      "description": "Valkey stays on 8.1.x until a deliberate move: the CI job image's Valkey must match the live Valkey (homeflare-mini src/ci-runner/image/Dockerfile, ONE DECLARED VALKEY). Renovate PR 297 in homeflare-mini bumped it to 9.x on 2026-10-19 and broke every fresh job-image build. A major Valkey move is a planned change, not a bump.",
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["docker.io/valkey/valkey", "valkey/valkey"],
+      "allowedVersions": "<9"
     }
   ]
 }
