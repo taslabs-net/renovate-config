@@ -50,3 +50,8 @@ Two departures from `config:best-practices`:
 - **`@homeflare/*` is one group, with no release-age wait, and it automerges on green,**
   including a major. A red check is the exception and stays open. `homeflare-bumper` must
   stay off (`KIT_BUMP_ENABLED` not `true`) so it does not open a second pull for the same release.
+- **The Effect stack is one group, `effect-stack`:** `effect`, `@effect/*`, `alchemy`,
+  `@alchemy.run/*` and `@distilled.cloud/*` always move together and never automerge.
+  alchemy depends on distilled at an exact version, so a lone bump installs a second
+  `effect` and the types collapse to `any`. This rule does not lift the separate `effect`
+  HOLD at 4.0.3; that is a deliberate decision of its own.

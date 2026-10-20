@@ -161,17 +161,17 @@
       "groupSlug": "cloudflare-workers"
     },
     {
-      "description": "Upstream tracker: Alchemy (the estate runs the 2.0 beta line) and its distilled SDKs. One group, never automerged: a beta bump can change resource behaviour.",
-      "matchPackageNames": ["alchemy", "@alchemy/**", "@distilled.cloud/**"],
-      "groupName": "alchemy",
-      "groupSlug": "alchemy",
+      "description": "★ Upstream tracker: the Effect stack. effect, @effect/*, alchemy, @alchemy.run/* and @distilled.cloud/* are ONE group because they must move together: alchemy depends on @distilled.cloud/* at an exact version, so a lone bump of either installs a second copy of effect and every Effect type collapses to any with no error (measured 2026-10-20, alchemy 2.0.0-beta.83 pins @distilled.cloud/core 1.0.0-rc.15 exactly). Replaces the separate alchemy and effect groups. Never automerged: a beta bump can change resource behaviour, and a stack move wants the kit's checkEffectStack read first.",
+      "matchPackageNames": [
+        "effect",
+        "@effect/**",
+        "alchemy",
+        "@alchemy.run/**",
+        "@distilled.cloud/**"
+      ],
+      "groupName": "effect-stack",
+      "groupSlug": "effect-stack",
       "automerge": false
-    },
-    {
-      "description": "Upstream tracker: Effect. effect and @effect/* share one version train; split bumps break peers. A non-major in this group automerges once checks are green. A major stays a pull request.",
-      "matchPackageNames": ["effect", "@effect/**"],
-      "groupName": "effect",
-      "groupSlug": "effect"
     },
     {
       "description": "HOLD: effect pinned to exactly 4.0.3 fleet-wide (the effect resolution alchemy 2.0.0-beta.81's anchors were verified against — landscape scripts/deploy-approve/env.ts VERIFIED_EFFECT_VERSIONS). 4.0.4+ changes Effect's requirements type parameter so `Effect<A, E, any>` no longer assigns to `Effect<A, E, never>`, which fails `tsc` in homeflare-landscape (scripts/memory/api.ts, scripts/seats/bundles/sdk-port.ts) and would fail deploy-approve's effect-layer check. Lift only after a newer effect passes the effect-layer review and VERIFIED_EFFECT_VERSIONS gains that resolution.",
