@@ -27,6 +27,9 @@ with no release timestamp). Python gets the same three-day age via
 `security:minimumReleaseAgePypi`. A global `minimumReleaseAge` is not set: applied to
 `pin`, `replacement`, and lockfile updates, that check never clears.
 
+Vendored charts under `talos/charts/` (homeflare-proxmox) are never touched: they are verbatim
+helm pulls pinned by a tree digest, so a Renovate edit cannot pass; bumps are a re-pull and re-pin.
+
 Two departures from `config:best-practices`:
 
 - Bun and npm range pins stay off. `:pinDevDependencies` opened immortal PRs,
