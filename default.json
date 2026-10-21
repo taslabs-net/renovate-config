@@ -25,6 +25,11 @@
   },
   "packageRules": [
     {
+      "description": "Vendored charts (homeflare-proxmox talos/charts/**) are verbatim helm pulls pinned by a tree digest and a provenance list, so a Renovate edit to a file under them can never pass check; a bump is a re-pull plus re-pin in one reviewed change. A packageRule on the file path, not ignorePaths: ignorePaths would replace the :ignoreModulesAndTests defaults that config:best-practices sets.",
+      "matchFileNames": ["**/talos/charts/**"],
+      "enabled": false
+    },
+    {
       "description": "config:best-practices includes :pinDevDependencies. Those range pins were immortal, automerge stayed off, and renovate/artifacts failed, so the queue filled with pin PRs that could not land. Digest pins for Docker stay.",
       "matchManagers": ["bun", "npm"],
       "matchUpdateTypes": ["pin"],
