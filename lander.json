@@ -1,0 +1,30 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "description": "Lander mode, extended AFTER the default preset: github>taslabs-net/renovate-config:lander. Renovate stops merging anything itself (no platform auto-merge, no branch merge), so hf-lander (homeflare-ct100 src/lander) is the one merge path. Eligibility does not change: default.json still sets the lander:eligible or hold label beside every automerge decision, and keepUpdatedLabel still rebases eligible pulls when they fall behind. Rendered into a repository's renovate.json by @homeflare/config only when its repo-shape says the lander lands it, which must follow that repository joining the lander's LIVE_REPOS, or nothing lands there.",
+  "automerge": false,
+  "platformAutomerge": false,
+  "lockFileMaintenance": {
+    "automerge": false
+  },
+  "vulnerabilityAlerts": {
+    "automerge": false
+  },
+  "packageRules": [
+    {
+      "description": "Last rule wins: every update type, whatever a default.json rule set, is proposed and labelled but never merged by Renovate.",
+      "matchUpdateTypes": [
+        "major",
+        "minor",
+        "patch",
+        "pin",
+        "pinDigest",
+        "digest",
+        "lockFileMaintenance",
+        "rollback",
+        "bump",
+        "replacement"
+      ],
+      "automerge": false
+    }
+  ]
+}

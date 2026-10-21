@@ -5,22 +5,28 @@
   "timezone": "America/New_York",
   "schedule": ["* * * * *"],
   "prConcurrentLimit": 5,
-  "prHourlyLimit": 2,
+  "prHourlyLimit": 1,
   "labels": ["dependencies"],
   "platformAutomerge": true,
   "automergeType": "pr",
   "rebaseWhen": "auto",
-  "prCreation": "not-pending",
+  "keepUpdatedLabel": "lander:eligible",
+  "prCreation": "immediate",
+  "internalChecksFilter": "strict",
   "lockFileMaintenance": {
     "enabled": true,
     "automerge": true,
+    "labels": ["dependencies", "lander:eligible"],
     "schedule": ["before 6am on monday"]
   },
   "vulnerabilityAlerts": {
-    "description": "Security fix PRs from GitHub's Dependabot alerts (alerts stay on; Dependabot's own fix PRs are off). Renovate applies this block as a forced override, so a plain packageRule cannot regroup it: the shared branchTopic below keeps the vitest family on ONE branch, and the vitest <5 allowedVersions packageRule still applies because GitHub-alert rules only set matchCurrentVersion. osvVulnerabilityAlerts is deliberately NOT enabled: OSV fix rules force allowedVersions to the fixed version and would bypass the vitest cap.",
+    "description": "Security fix PRs from GitHub's Dependabot alerts (alerts stay on; Dependabot's own fix PRs are off). Renovate applies this block as a forced override, so a plain packageRule cannot regroup it: the shared branchTopic below keeps the vitest family on ONE branch, and the vitest <5 allowedVersions packageRule still applies because GitHub-alert rules only set matchCurrentVersion. osvVulnerabilityAlerts is deliberately NOT enabled: OSV fix rules force allowedVersions to the fixed version and would bypass the vitest cap. ⚠️ The block is applied as `force` (Renovate init/vulnerability.js), so no packageRule can re-hold it: a GitHub-alert fix for a held family (vitest, alchemy, effect, bun, payload, the ct100 obs images) is labelled lander:eligible and automerges once checks are green. A security fix outranks the hold on purpose; deploy-approve still verifies the alchemy/effect pair before any deploy.",
     "enabled": true,
     "automerge": true,
-    "labels": ["dependencies", "security"],
+    "labels": ["dependencies", "security", "lander:eligible"],
+    "minimumReleaseAge": null,
+    "dependencyDashboardApproval": false,
+    "prCreation": "immediate",
     "branchTopic": "{{#if (or (equals depName 'vitest') (containsString depName '@vitest/') (equals depName '@cloudflare/vitest-pool-workers'))}}vitest-vulnerability{{else}}{{{datasource}}}-{{{depNameSanitized}}}-vulnerability{{/if}}"
   },
   "customManagers": [
@@ -58,11 +64,12 @@
         "docker.io/grafana/grafana",
         "docker.io/victoriametrics/**"
       ],
-      "automerge": false
+      "automerge": false,
+      "labels": ["dependencies", "hold"]
     },
     {
-      "description": "Vendored charts (homeflare-proxmox talos/charts/**) are verbatim helm pulls pinned by a tree digest and a provenance list, so a Renovate edit to a file under them can never pass check; a bump is a re-pull plus re-pin in one reviewed change. A packageRule on the file path, not ignorePaths: ignorePaths would replace the :ignoreModulesAndTests defaults that config:best-practices sets.",
-      "matchFileNames": ["**/talos/charts/**"],
+      "description": "Vendored content is never edited. homeflare-os packages/artifacts-ci/os-core-lock/** is an upstream workspace kept only for its lockfile (its workspace:* members are absent, so every pnpm artifact update there fails, measured 2026-10-21). Vendored charts (homeflare-proxmox talos/charts/**) are verbatim helm pulls pinned by a tree digest and a provenance list, so a Renovate edit to a file under them can never pass check; a bump is a re-pull plus re-pin in one reviewed change. A packageRule on the file path, not ignorePaths: ignorePaths would replace the :ignoreModulesAndTests defaults that config:best-practices sets.",
+      "matchFileNames": ["**/talos/charts/**", "**/os-core-lock/**"],
       "enabled": false
     },
     {
@@ -78,12 +85,19 @@
       "enabled": false
     },
     {
+      "description": "Third-party release age by update type: config:best-practices already waits 3 days for every npm update (security:minimumReleaseAgeNpm) and this preset extends the same for PyPI, so a patch waits 3 days; a minor or major waits 7. Only npm and PyPI: their NAS cache lookups keep the publish timestamp, while the docker distribution proxies and the Go proxy path give none or none checked, and minimumReleaseAgeBehaviour timestamp-required would hold those updates forever. The first-party kit rule below sets null and wins.",
+      "matchDatasources": ["npm", "pypi"],
+      "matchUpdateTypes": ["minor", "major"],
+      "minimumReleaseAge": "7 days"
+    },
+    {
       "description": "bun/npm: group minor+patch, automerge on green.",
       "matchManagers": ["bun", "npm"],
       "matchUpdateTypes": ["minor", "patch"],
       "groupName": "bun/npm non-major",
       "groupSlug": "js-non-major",
-      "automerge": true
+      "automerge": true,
+      "labels": ["dependencies", "lander:eligible"]
     },
     {
       "description": "GitHub Actions: group minor+patch+digest, automerge on green.",
@@ -91,7 +105,8 @@
       "matchUpdateTypes": ["minor", "patch", "digest"],
       "groupName": "github-actions non-major",
       "groupSlug": "actions-non-major",
-      "automerge": true
+      "automerge": true,
+      "labels": ["dependencies", "lander:eligible"]
     },
     {
       "description": "Docker / Dockerfile / compose: group minor+patch+digest, automerge on green.",
@@ -99,7 +114,8 @@
       "matchUpdateTypes": ["minor", "patch", "digest", "pinDigest"],
       "groupName": "docker non-major",
       "groupSlug": "docker-non-major",
-      "automerge": true
+      "automerge": true,
+      "labels": ["dependencies", "lander:eligible"]
     },
     {
       "description": "Python: group minor+patch across the package managers the fleet uses, automerge on green.",
@@ -107,14 +123,16 @@
       "matchUpdateTypes": ["minor", "patch"],
       "groupName": "python non-major",
       "groupSlug": "python-non-major",
-      "automerge": true
+      "automerge": true,
+      "labels": ["dependencies", "lander:eligible"]
     },
     {
       "description": "psycopg and psycopg-binary release together. Their own group, so a binary bump cannot land apart from the library.",
       "matchPackageNames": ["psycopg", "psycopg-binary", "psycopg2", "psycopg2-binary"],
       "groupName": "psycopg",
       "groupSlug": "psycopg",
-      "automerge": true
+      "automerge": true,
+      "labels": ["dependencies", "lander:eligible"]
     },
     {
       "description": "Go modules: group minor+patch, automerge on green. A module xcaddy rewrites still fails its check and stays for a person.",
@@ -122,7 +140,8 @@
       "matchUpdateTypes": ["minor", "patch"],
       "groupName": "go non-major",
       "groupSlug": "go-non-major",
-      "automerge": true
+      "automerge": true,
+      "labels": ["dependencies", "lander:eligible"]
     },
     {
       "description": "golang.org/x moves as one module family.",
@@ -130,7 +149,8 @@
       "matchPackageNames": ["golang.org/x/**"],
       "groupName": "golang.org/x",
       "groupSlug": "golang-x",
-      "automerge": true
+      "automerge": true,
+      "labels": ["dependencies", "lander:eligible"]
     },
     {
       "description": "google.golang.org, including grpc and genproto, moves as one module family.",
@@ -138,7 +158,8 @@
       "matchPackageNames": ["google.golang.org/**"],
       "groupName": "google.golang.org",
       "groupSlug": "google-golang",
-      "automerge": true
+      "automerge": true,
+      "labels": ["dependencies", "lander:eligible"]
     },
     {
       "description": "OpenTelemetry Go modules release together.",
@@ -146,7 +167,8 @@
       "matchPackageNames": ["go.opentelemetry.io/**"],
       "groupName": "opentelemetry go",
       "groupSlug": "otel-go",
-      "automerge": true
+      "automerge": true,
+      "labels": ["dependencies", "lander:eligible"]
     },
     {
       "description": "Caddy and its security handler. One group. xcaddy regenerates builds/caddy/go.mod, so a bump that does not match that output fails the check and is not automerged.",
@@ -154,7 +176,8 @@
       "matchPackageNames": ["github.com/caddyserver/**", "github.com/greenpau/caddy-security"],
       "groupName": "caddy",
       "groupSlug": "caddy",
-      "automerge": true
+      "automerge": true,
+      "labels": ["dependencies", "lander:eligible"]
     },
     {
       "description": "Model Context Protocol packages share one version train.",
@@ -162,20 +185,23 @@
       "matchUpdateTypes": ["minor", "patch"],
       "groupName": "mcp",
       "groupSlug": "mcp",
-      "automerge": true
+      "automerge": true,
+      "labels": ["dependencies", "lander:eligible"]
     },
     {
-      "description": "Majors are never automerged; they want reading. A GitHub security alert is the exception: vulnerabilityAlerts.automerge lands it once required checks are green.",
+      "description": "Majors are never automerged; they want reading. A third-party major is not even proposed until someone ticks it on the Dependency Dashboard (dependencyDashboardApproval), and it carries the lander hold label, so a green major still waits for a person to remove hold. A GitHub security alert is the exception: the vulnerabilityAlerts block forces approval off and lands it once required checks are green. The first-party kit rule below turns approval back off for @homeflare/*.",
       "matchUpdateTypes": ["major"],
       "automerge": false,
-      "dependencyDashboardApproval": false
+      "labels": ["dependencies", "hold"],
+      "dependencyDashboardApproval": true
     },
     {
       "description": "vitest family moves as ONE group: vitest, @vitest/* and @cloudflare/vitest-pool-workers. Splitting them breaks peers (pool-workers pins vitest's major). Never automerged.",
       "matchPackageNames": ["vitest", "@vitest/**", "@cloudflare/vitest-pool-workers"],
       "groupName": "vitest",
       "groupSlug": "vitest",
-      "automerge": false
+      "automerge": false,
+      "labels": ["dependencies", "hold"]
     },
     {
       "description": "Hold vitest + @vitest/* at the major @cloudflare/vitest-pool-workers supports (its peer is vitest ^4.1 as of 0.23.0). Raise this cap only when a pool-workers release widens its vitest peer range.",
@@ -187,7 +213,8 @@
       "matchPackageNames": ["payload", "@payloadcms/**"],
       "groupName": "payload",
       "groupSlug": "payload",
-      "automerge": false
+      "automerge": false,
+      "labels": ["dependencies", "hold"]
     },
     {
       "description": "Upstream tracker: Cloudflare Workers toolchain. wrangler, miniflare, @cloudflare/workers-types, @cloudflare/workers-oauth-provider and @cloudflare/vite-plugin move together. @cloudflare/vitest-pool-workers stays in the vitest group, which owns its peer cap. A non-major automerges once checks are green. A major stays a pull request.",
@@ -206,7 +233,8 @@
       "matchPackageNames": ["alchemy", "@alchemy/**", "@distilled.cloud/**"],
       "groupName": "alchemy",
       "groupSlug": "alchemy",
-      "automerge": false
+      "automerge": false,
+      "labels": ["dependencies", "hold"]
     },
     {
       "description": "Upstream tracker: Effect. effect and @effect/* share one version train; split bumps break peers. A non-major in this group automerges once checks are green. A major stays a pull request.",
@@ -225,7 +253,8 @@
       "matchPackageNames": ["bun", "@types/bun", "bun-types", "oven/bun"],
       "groupName": "bun",
       "groupSlug": "bun",
-      "automerge": false
+      "automerge": false,
+      "labels": ["dependencies", "hold"]
     },
     {
       "description": "HOLD: Bun runtime pinned to exactly 1.4.0 fleet-wide (Tim 2026-10-14). In Bun 1.4.2, a process that installs a SIGTERM or SIGINT handler exits 143 and its cleanup never runs, so seed and cleanup tests fail and pre-push hooks block. 1.4.0 is verified good. Covers packageManager, engines, setup-bun bun-version and the oven/bun image. @types/bun is type-only and is not held. Lift this only after a newer Bun passes homeflare-openbao's SIGINT/SIGTERM seed tests.",
@@ -247,20 +276,41 @@
     },
     {
       "description": "builds/caddy/go.mod is what xcaddy writes from builds/caddy/build.ts (Caddy stays at the measured 2.11.4). A module bump in that file is rewritten back and the check fails. Bump the catalog in build.ts instead.",
-      "matchRepositories": ["homeflare-builds"],
+      "matchRepositories": ["taslabs-net/homeflare-builds"],
       "matchManagers": ["gomod"],
       "matchFileNames": ["builds/caddy/**"],
       "enabled": false
     },
     {
-      "description": "First-party kit. One group per repo, no release-age wait, and not held to the host's weekday-morning schedule. Automerges once required checks are green, including a major. This rule wins the major ban. The @homeflare/config refresh rule after it does not set automerge. homeflare-bumper stays off (KIT_BUMP_ENABLED is not true) or the two bots open competing PRs.",
+      "description": "First-party kit. One group per repo, a one-hour soak instead of the third-party release age, no dashboard approval, prPriority 10 (created before any other pull within the per-repo limits), and not held to the host schedule. Automerges once required checks are green. Tim wants the fleet bump fast (2026-10-21); the soak is the Opus round-1 fix: the kit repo is private, so npm provenance is off and a rogue or broken publish is otherwise on every consumer within minutes, and a @homeflare/config refresh rewrites the CI workflow that grades it. The canary rule below takes a release at once, so a bad one shows red there first; a hold for a bad version is one allowedVersions commit here. This rule wins the major ban; the kit-major rule after it holds majors. The @homeflare/config refresh rule does not set automerge.",
       "matchPackageNames": ["@homeflare/**"],
       "groupName": "homeflare kit",
       "groupSlug": "homeflare-kit",
-      "minimumReleaseAge": null,
+      "minimumReleaseAge": "1 hour",
       "schedule": ["at any time"],
+      "dependencyDashboardApproval": false,
+      "prPriority": 10,
       "automerge": true,
+      "labels": ["dependencies", "lander:eligible"],
       "enabled": true
+    },
+    {
+      "description": "Lock-file maintenance sorts last and only runs in the Monday-morning window, so with one new pull per repo per hour it could slip behind the backlog for weeks (Opus round 2). prPriority 5 puts it after the kit (10) and before everything else.",
+      "matchUpdateTypes": ["lockFileMaintenance"],
+      "prPriority": 5
+    },
+    {
+      "description": "Kit canary: homeflare-wiki takes every @homeflare release with no soak, so a broken release goes red there inside the hour the rest of the fleet waits. Pick a canary with a real ci and no deploy of its own.",
+      "matchRepositories": ["taslabs-net/homeflare-wiki"],
+      "matchPackageNames": ["@homeflare/**"],
+      "minimumReleaseAge": null
+    },
+    {
+      "description": "Kit majors are proposed with the kit group's speed but held: a breaking kit change lands only when a person removes hold (or, in lander mode, through the lander with its own gates). ⚠️ INERT WHILE THE KIT IS 0.x (every @homeflare package today): Renovate classifies 0.36 -> 0.37 as minor (lookup/update-type.js), so this matches nothing until a package reaches 1.0. 0.x minors landing after the soak is the deliberate fast-track (Tim 2026-10-21); the soak, the canary and the allowedVersions kill switch are its guard, not this rule.",
+      "matchPackageNames": ["@homeflare/**"],
+      "matchUpdateTypes": ["major"],
+      "automerge": false,
+      "labels": ["dependencies", "hold"]
     },
     {
       "description": "After @homeflare/config is bumped, install that lockfile and refresh the rendered repo shape in the same commit. The command string is RENOVATE_REPO_SHAPE_REFRESH in homeflare-mini; the admin allowlist matches it and nothing else. A repo with no repo-shape:refresh script exits 0. This rule does not set automerge, so the kit rule above still wins the major ban.",
@@ -280,7 +330,7 @@
       }
     },
     {
-      "description": "homeflare-kit publishes exact dependency versions that must equal the root catalog. After a bump, copy those versions into catalog. The command string is RENOVATE_CATALOG_SYNC in homeflare-mini; the admin allowlist matches it and nothing else. A repo with no catalog exits 0.",
+      "description": "homeflare-kit publishes exact dependency versions that must equal the root catalog. After a bump, copy those versions into catalog. The command string is RENOVATE_CATALOG_SYNC in homeflare-mini; the admin allowlist matches it and nothing else. A repo with no catalog exits 0. ⚠️ INERT ON PURPOSE (Opus round 3, 2026-10-21): the bare name never matches taslabs-net/homeflare-kit, so this has never run. Do not fix the name alone: Renovate 44 does not read bun's root catalog, so the sync would rewrite package.json after bun.lock was rebuilt (bun.lock keeps its own catalog copy) and every frozen-lockfile CI would fail. Re-land with a lockfile-only bun install after the sync, bun.lock in fileFilters, and the matching CE allowedCommands and homeflare-mini RENOVATE_CATALOG_SYNC change.",
       "matchRepositories": ["homeflare-kit"],
       "matchManagers": ["bun", "npm"],
       "postUpgradeTasks": {
