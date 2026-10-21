@@ -330,8 +330,8 @@
       }
     },
     {
-      "description": "homeflare-kit publishes exact dependency versions that must equal the root catalog. After a bump, copy those versions into catalog. The command string is RENOVATE_CATALOG_SYNC in homeflare-mini; the admin allowlist matches it and nothing else. A repo with no catalog exits 0.",
-      "matchRepositories": ["taslabs-net/homeflare-kit"],
+      "description": "homeflare-kit publishes exact dependency versions that must equal the root catalog. After a bump, copy those versions into catalog. The command string is RENOVATE_CATALOG_SYNC in homeflare-mini; the admin allowlist matches it and nothing else. A repo with no catalog exits 0. ⚠️ INERT ON PURPOSE (Opus round 3, 2026-10-21): the bare name never matches taslabs-net/homeflare-kit, so this has never run. Do not fix the name alone: Renovate 44 does not read bun's root catalog, so the sync would rewrite package.json after bun.lock was rebuilt (bun.lock keeps its own catalog copy) and every frozen-lockfile CI would fail. Re-land with a lockfile-only bun install after the sync, bun.lock in fileFilters, and the matching CE allowedCommands and homeflare-mini RENOVATE_CATALOG_SYNC change.",
+      "matchRepositories": ["homeflare-kit"],
       "matchManagers": ["bun", "npm"],
       "postUpgradeTasks": {
         "commands": [

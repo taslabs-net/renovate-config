@@ -86,9 +86,9 @@ Vendored content is never edited: charts under `talos/charts/` (homeflare-proxmo
 helm pulls pinned by a tree digest, and homeflare-os `os-core-lock/` is an upstream workspace kept
 for its lockfile, whose `workspace:*` members are absent, so every artifact update there fails.
 
-Two repository rules named a bare repo (`homeflare-builds`, `homeflare-kit`), which never matches
-`owner/repo`, so the Caddy `go.mod` disable and the kit catalog sync never ran; they now use full
-names (a test keeps it so).
+The Caddy `go.mod` disable named a bare repo (`homeflare-builds`), which never matches
+`owner/repo`; it now uses the full name (a test keeps it so). The kit catalog sync is still bare,
+inert on purpose: enabling it as written would leave `bun.lock` stale and fail frozen installs.
 
 Two departures from `config:best-practices`:
 

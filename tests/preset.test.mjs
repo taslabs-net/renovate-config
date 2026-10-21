@@ -83,8 +83,13 @@ test('kit: a one-hour soak, a canary that takes it at once, and majors held', ()
 });
 
 test('matchRepositories always names owner/repo (a bare name never matches)', () => {
+  // ★ The one exception is the kit catalog sync, inert on purpose until its lockfile step exists.
+  const inert = (rule) => rule.description.includes('INERT ON PURPOSE');
   for (const rule of preset.packageRules) {
-    for (const repo of rule.matchRepositories ?? []) assert.match(repo, /^[^/]+\/[^/]+$/, repo);
+    for (const repo of rule.matchRepositories ?? []) {
+      if (inert(rule)) assert.equal(repo, 'homeflare-kit');
+      else assert.match(repo, /^[^/]+\/[^/]+$/, repo);
+    }
   }
 });
 
