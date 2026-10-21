@@ -44,6 +44,11 @@ test('eligible pulls are rebased when behind; everything else only when conflict
   for (const rule of preset.packageRules) assert.equal('rebaseWhen' in rule, false);
 });
 
+test('limits: 5 open and 1 new pull per repository per hour', () => {
+  assert.equal(preset.prConcurrentLimit, 5);
+  assert.equal(preset.prHourlyLimit, 1);
+});
+
 test('a pull is opened at once: CI runs on pull_request only, so not-pending never cleared', () => {
   assert.equal(preset.prCreation, 'immediate');
   assert.equal(preset.internalChecksFilter, 'strict');

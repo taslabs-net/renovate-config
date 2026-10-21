@@ -77,8 +77,10 @@ with no release timestamp). Python gets the same three-day age via
 - Groups minor + patch: bun/npm, GitHub Actions, Docker, Python, Go, `golang.org/x`,
   `google.golang.org`, OpenTelemetry Go, Caddy, and `@modelcontextprotocol/*`. psycopg and
   psycopg-binary are their own group. Weekly lockfile maintenance (Monday before 06:00).
-- `prConcurrentLimit: 5`, `prHourlyLimit: 2`, timezone `America/New_York`. Schedule is
-  "any time": the server's cron and the App's webhook events decide when jobs run.
+- `prConcurrentLimit: 5`, `prHourlyLimit: 1` (was 2; Opus round 1: the `prCreation` flip lets
+  ~318 waiting branches open, and each merge rebases the eligible rest), timezone
+  `America/New_York`. Kit pulls are created first (`prPriority`), security pulls ignore the hourly
+  limit. Schedule is "any time": the server's cron and the App's webhook events decide when jobs run.
 
 Vendored content is never edited: charts under `talos/charts/` (homeflare-proxmox) are verbatim
 helm pulls pinned by a tree digest, and homeflare-os `os-core-lock/` is an upstream workspace kept

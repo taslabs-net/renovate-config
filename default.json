@@ -5,7 +5,7 @@
   "timezone": "America/New_York",
   "schedule": ["* * * * *"],
   "prConcurrentLimit": 5,
-  "prHourlyLimit": 2,
+  "prHourlyLimit": 1,
   "labels": ["dependencies"],
   "platformAutomerge": true,
   "automergeType": "pr",
