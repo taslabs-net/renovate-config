@@ -41,6 +41,19 @@
         "'(?<depName>[a-z0-9.-]+\\.[a-z]+/[A-Za-z0-9._/-]+):(?<currentValue>[A-Za-z0-9._-]+)@(?<currentDigest>sha256:[a-f0-9]{64})'"
       ],
       "datasourceTemplate": "docker"
+    },
+    {
+      "customType": "regex",
+      "description": "homeflare-ct100 Grafana DuckDB-federator drop-in: grafana.container.d/60-duckdb-federator.conf sets Grafana's EFFECTIVE image (the same version's -ubuntu variant; a Quadlet drop-in Image= wins over the .container file's). Its declared source is src/grafana-duckdb/image.ts and its byte-exact copy is the fixture; this manager edits both (same depName and version, one branch) so tests/grafana-duckdb-dropin.test.ts stays green. Keep the -ubuntu tag on the same version as src/reconcile/grafana.ts: the 2026-10-21 wave bumped only the .container pin and Grafana stayed on 13.1.4.",
+      "managerFilePatterns": [
+        "/^src/grafana-duckdb/image\\.ts$/",
+        "/^src/obs-render/grafana\\.container\\.d/60-duckdb-federator\\.conf$/"
+      ],
+      "matchStrings": [
+        "'(?<depName>[a-z0-9.-]+\\.[a-z]+/[A-Za-z0-9._/-]+):(?<currentValue>[A-Za-z0-9._-]+)@(?<currentDigest>sha256:[a-f0-9]{64})'",
+        "Image=(?<depName>[a-z0-9.-]+\\.[a-z]+/[A-Za-z0-9._/-]+):(?<currentValue>[A-Za-z0-9._-]+)@(?<currentDigest>sha256:[a-f0-9]{64})"
+      ],
+      "datasourceTemplate": "docker"
     }
   ],
   "packageRules": [
