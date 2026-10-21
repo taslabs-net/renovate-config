@@ -23,7 +23,43 @@
     "labels": ["dependencies", "security"],
     "branchTopic": "{{#if (or (equals depName 'vitest') (containsString depName '@vitest/') (equals depName '@cloudflare/vitest-pool-workers'))}}vitest-vulnerability{{else}}{{{datasource}}}-{{{depNameSanitized}}}-vulnerability{{/if}}"
   },
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "homeflare-ct100 declares each obs image twice: in the props (src/alertmanager.ts, victoria-*.ts, vmagent.ts, reconcile/grafana.ts, reconcile/vmalert.ts) and in the byte-exact live copy src/obs-render/<name>.container, which the quadlet manager already tracks. Renovate edited only the copy, so tests/reconcile-render.test.ts failed on every bump (ct100 PRs 485, 486, 487, 492, 538). This manager edits the props too; same depName and version, so one branch. The file patterns match nothing in any other repo. Add a file only when its tests do not hardcode the tag or digest.",
+      "managerFilePatterns": [
+        "/^src/(alertmanager|victoria-logs|victoria-traces|victoria-metrics|vmagent)\\.ts$/",
+        "/^src/reconcile/(grafana|vmalert)\\.ts$/"
+      ],
+      "matchStrings": [
+        "'(?<depName>[a-z0-9.-]+\\.[a-z]+/[A-Za-z0-9._/-]+):(?<currentValue>[A-Za-z0-9._-]+)@(?<currentDigest>sha256:[a-f0-9]{64})'"
+      ],
+      "datasourceTemplate": "docker"
+    }
+  ],
   "packageRules": [
+    {
+      "description": "homeflare-ct100: src/obs-render/*.container is the byte-exact copy of the live Quadlet, and tests/reconcile-render.test.ts renders it from the props, so a fixture-only bump can never pass. Images the ct100 regex manager above does not cover (forgejo, openwebui, paperless, the exporters, unpoller) are bumped by hand with their props and tests; extend that manager's file list instead of removing this rule.",
+      "matchRepositories": ["taslabs-net/homeflare-ct100"],
+      "matchManagers": ["quadlet"],
+      "matchFileNames": ["src/obs-render/**"],
+      "matchPackageNames": [
+        "!docker.io/prom/alertmanager",
+        "!docker.io/grafana/grafana",
+        "!docker.io/victoriametrics/**"
+      ],
+      "enabled": false
+    },
+    {
+      "description": "homeflare-ct100: these images run live on CT100 (the obs plane). A merge changes the declared image and the next deploy restarts the unit onto it, so none automerges: read the upstream notes and plan the deploy.",
+      "matchRepositories": ["taslabs-net/homeflare-ct100"],
+      "matchPackageNames": [
+        "docker.io/prom/alertmanager",
+        "docker.io/grafana/grafana",
+        "docker.io/victoriametrics/**"
+      ],
+      "automerge": false
+    },
     {
       "description": "Vendored charts (homeflare-proxmox talos/charts/**) are verbatim helm pulls pinned by a tree digest and a provenance list, so a Renovate edit to a file under them can never pass check; a bump is a re-pull plus re-pin in one reviewed change. A packageRule on the file path, not ignorePaths: ignorePaths would replace the :ignoreModulesAndTests defaults that config:best-practices sets.",
       "matchFileNames": ["**/talos/charts/**"],
