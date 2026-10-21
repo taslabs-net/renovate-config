@@ -35,7 +35,7 @@
       "description": "homeflare-ct100 declares each obs image twice: in the props (src/alertmanager.ts, victoria-*.ts, vmagent.ts, reconcile/grafana.ts, reconcile/vmalert.ts) and in the byte-exact live copy src/obs-render/<name>.container, which the quadlet manager already tracks. Renovate edited only the copy, so tests/reconcile-render.test.ts failed on every bump (ct100 PRs 485, 486, 487, 492, 538). This manager edits the props too; same depName and version, so one branch. The file patterns match nothing in any other repo. Add a file only when its tests do not hardcode the tag or digest.",
       "managerFilePatterns": [
         "/^src/(alertmanager|victoria-logs|victoria-traces|victoria-metrics|vmagent)\\.ts$/",
-        "/^src/reconcile/(grafana|vmalert)\\.ts$/"
+        "/^src/reconcile/vmalert\\.ts$/"
       ],
       "matchStrings": [
         "'(?<depName>[a-z0-9.-]+\\.[a-z]+/[A-Za-z0-9._/-]+):(?<currentValue>[A-Za-z0-9._-]+)@(?<currentDigest>sha256:[a-f0-9]{64})'"
@@ -44,7 +44,7 @@
     },
     {
       "customType": "regex",
-      "description": "homeflare-ct100 Grafana DuckDB-federator drop-in: grafana.container.d/60-duckdb-federator.conf sets Grafana's EFFECTIVE image (the same version's -ubuntu variant; a Quadlet drop-in Image= wins over the .container file's). Its declared source is src/grafana-duckdb/image.ts and its byte-exact copy is the fixture; this manager edits both (same depName and version, one branch) so tests/grafana-duckdb-dropin.test.ts stays green. Keep the -ubuntu tag on the same version as src/reconcile/grafana.ts: the 2026-10-21 wave bumped only the .container pin and Grafana stayed on 13.1.4.",
+      "description": "homeflare-ct100 Grafana DuckDB-federator drop-in: grafana.container.d/60-duckdb-federator.conf sets Grafana's EFFECTIVE image (the same version's -ubuntu variant; a Quadlet drop-in Image= wins over the .container file's). Its declared source is src/grafana-duckdb/image.ts and its byte-exact copy is the fixture; this manager edits both (same depName and version, one branch) so tests/grafana-duckdb-dropin.test.ts stays green. Since ct100 PR 610 this is the ONE Grafana pin: src/reconcile/grafana.ts imports it (GRAFANA_IMAGE), and the quadlet manager edits the .container fixture on the same branch (same depName and version). History: the 2026-10-21 wave bumped only the .container pin while this drop-in pinned 13.1.4-ubuntu, so Grafana stayed on 13.1.4.",
       "managerFilePatterns": [
         "/^src/grafana-duckdb/image\\.ts$/",
         "/^src/obs-render/grafana\\.container\\.d/60-duckdb-federator\\.conf$/"
