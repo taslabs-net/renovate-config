@@ -78,6 +78,19 @@ test('kit: a one-hour soak, a canary that takes it at once, and majors held', ()
   assert.ok(major > kit);
   assert.equal(rules[major].automerge, false);
   assert.deepEqual(rules[major].labels, HOLD);
+  // Inert while the kit is 0.x (Renovate calls 0.36 -> 0.37 a minor); the description must say so.
+  assert.match(rules[major].description, /INERT WHILE THE KIT IS 0\.x/);
+});
+
+test('matchRepositories always names owner/repo (a bare name never matches)', () => {
+  for (const rule of preset.packageRules) {
+    for (const repo of rule.matchRepositories ?? []) assert.match(repo, /^[^/]+\/[^/]+$/, repo);
+  }
+});
+
+test('lock-file maintenance is created after the kit and before everything else', () => {
+  const rule = preset.packageRules.find((r) => r.matchUpdateTypes?.join() === 'lockFileMaintenance');
+  assert.equal(rule.prPriority, 5);
 });
 
 test('release age: 7 days for npm and PyPI minor/major, before the kit rule that replaces it', () => {

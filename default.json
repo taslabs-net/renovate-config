@@ -276,7 +276,7 @@
     },
     {
       "description": "builds/caddy/go.mod is what xcaddy writes from builds/caddy/build.ts (Caddy stays at the measured 2.11.4). A module bump in that file is rewritten back and the check fails. Bump the catalog in build.ts instead.",
-      "matchRepositories": ["homeflare-builds"],
+      "matchRepositories": ["taslabs-net/homeflare-builds"],
       "matchManagers": ["gomod"],
       "matchFileNames": ["builds/caddy/**"],
       "enabled": false
@@ -295,13 +295,18 @@
       "enabled": true
     },
     {
+      "description": "Lock-file maintenance sorts last and only runs in the Monday-morning window, so with one new pull per repo per hour it could slip behind the backlog for weeks (Opus round 2). prPriority 5 puts it after the kit (10) and before everything else.",
+      "matchUpdateTypes": ["lockFileMaintenance"],
+      "prPriority": 5
+    },
+    {
       "description": "Kit canary: homeflare-wiki takes every @homeflare release with no soak, so a broken release goes red there inside the hour the rest of the fleet waits. Pick a canary with a real ci and no deploy of its own.",
       "matchRepositories": ["taslabs-net/homeflare-wiki"],
       "matchPackageNames": ["@homeflare/**"],
       "minimumReleaseAge": null
     },
     {
-      "description": "Kit majors are proposed with the kit group's speed but held: a breaking kit change lands only when a person removes hold (or, in lander mode, through the lander with its own gates).",
+      "description": "Kit majors are proposed with the kit group's speed but held: a breaking kit change lands only when a person removes hold (or, in lander mode, through the lander with its own gates). ⚠️ INERT WHILE THE KIT IS 0.x (every @homeflare package today): Renovate classifies 0.36 -> 0.37 as minor (lookup/update-type.js), so this matches nothing until a package reaches 1.0. 0.x minors landing after the soak is the deliberate fast-track (Tim 2026-10-21); the soak, the canary and the allowedVersions kill switch are its guard, not this rule.",
       "matchPackageNames": ["@homeflare/**"],
       "matchUpdateTypes": ["major"],
       "automerge": false,
@@ -326,7 +331,7 @@
     },
     {
       "description": "homeflare-kit publishes exact dependency versions that must equal the root catalog. After a bump, copy those versions into catalog. The command string is RENOVATE_CATALOG_SYNC in homeflare-mini; the admin allowlist matches it and nothing else. A repo with no catalog exits 0.",
-      "matchRepositories": ["homeflare-kit"],
+      "matchRepositories": ["taslabs-net/homeflare-kit"],
       "matchManagers": ["bun", "npm"],
       "postUpgradeTasks": {
         "commands": [
