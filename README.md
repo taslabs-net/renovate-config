@@ -90,6 +90,11 @@ The Caddy `go.mod` disable named a bare repo (`homeflare-builds`), which never m
 `owner/repo`; it now uses the full name (a test keeps it so). The kit catalog sync is still bare,
 inert on purpose: enabling it as written would leave `bun.lock` stale and fail frozen installs.
 
+The Effect stack is one group, `effect-stack`: `effect`, `@effect/*`, `alchemy`, `@alchemy.run/*` and
+`@distilled.cloud/*` always move together and never automerge. alchemy depends on distilled at an exact
+version, so a lone bump installs a second `effect` and the types collapse to `any`. This group does not
+change the separate `effect` HOLD; lifting that is its own decision.
+
 Two departures from `config:best-practices`:
 
 - Bun and npm range pins stay off. `:pinDevDependencies` opened immortal PRs,
