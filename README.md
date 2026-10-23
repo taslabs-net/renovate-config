@@ -106,6 +106,18 @@ Two departures from `config:best-practices`:
 
 ## Checks
 
+Config refresh runs once per `@homeflare/config` upgrade, after package and lockfile updates.
+Renovate 44.134.1 sorts grouped upgrades by package name and takes branch settings from the
+first upgrade. `@homeflare/alchemy` sorts first, so a config-only task in `branch` mode is lost.
+`update` mode retains that task without changing its command, allowlist or output file filters.
+Two config upgrades in different manifests run it twice; repositories without config updates
+run it zero times. Each run still installs the final lockfile before refreshing the repo shape.
+
+The engine regression uses the installed vendor grouping function and executor, with isolated
+executor dependencies that record commands and cannot start subprocesses or write a checkout:
+`RENOVATE_ENGINE_ROOT=/path/to/renovate node --experimental-vm-modules tests/grouped-refresh-engine.mjs`.
+It requires engine 44.134.1; the ordinary invariant suite remains dependency-free.
+
 `node --test tests/` pins the invariants the lander depends on (no dependencies). Validate with
 the server's own Renovate (CE 15.7.0 bundles 44.134.1):
 `npx --package renovate@44.134.1 renovate-config-validator --strict default.json lander.json`.

@@ -339,7 +339,7 @@
           ".github/workflows/ci.yml",
           ".github/workflows/security.yml"
         ],
-        "executionMode": "branch"
+        "executionMode": "update"
       }
     },
     {
