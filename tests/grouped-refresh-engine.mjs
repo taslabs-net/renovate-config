@@ -16,13 +16,21 @@ const taskRule = preset.packageRules.find(r => r.matchPackageNames?.join() === '
 assert.ok(taskRule, 'Config refresh rule must exist');
 const task = taskRule.postUpgradeTasks;
 const { generateBranchConfig } = await import(pathToFileURL(root + '/dist/workers/repository/updates/generate.js'));
+const { minimatch } = await import(pathToFileURL(root + '/dist/util/minimatch.js'));
 const executorPath = root + '/dist/workers/repository/update/branch/execute-post-upgrade-commands.js';
 const executorSource = readFileSync(executorPath, 'utf8');
 const calls = [];
+const reads = [];
+let dirtyFiles = [];
+const dirtyContents = new Map([
+  ['bunfig.toml', Buffer.from('[install]\nexact = true\n')],
+  ['.github/workflows/ci.yml', Buffer.from('name: refreshed\n')],
+  ['unrelated.txt', Buffer.from('outside the refresh contract\n')],
+]);
 const config = { allowedCommands: ['^' + task.commands[0].replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '$'], localDir: '/isolated-fixture' };
 const noOp = () => {};
 const adapters = {
-  regEx: p => new RegExp(p), coerceArray: x => x ?? [],
+  regEx: p => new RegExp(p), coerceArray: x => x ?? [], minimatch,
   GlobalConfig: { get: key => config[key] },
   logger: { debug: noOp, trace: noOp, warn: noOp },
   addMeta: noOp, mergeChildConfig: (a, b) => ({ ...a, ...b }),
@@ -31,7 +39,12 @@ const adapters = {
   isString: x => typeof x === 'string',
   localPathIsFile: async () => false,
   withGitEnvironment: () => async command => { calls.push(command); return {}; },
-  getRepoStatus: async () => ({ modified: [], not_added: [], deleted: [] }),
+  getRepoStatus: async () => ({ modified: dirtyFiles, not_added: [], deleted: [] }),
+  readLocalFile: async path => {
+    assert.ok(dirtyContents.has(path), 'Unexpected fixture read: ' + path);
+    reads.push(path);
+    return dirtyContents.get(path);
+  },
   isFileModeEnabled: async () => false,
 };
 const executor = new vm.SourceTextModule(executorSource, { identifier: executorPath });
@@ -83,5 +96,29 @@ for (const [name, upgrades, count] of cases) {
     console.error('FAIL ' + name + ': ' + error.message);
   }
 }
-console.log(JSON.stringify({ version, cases: cases.length, failures, commandExecution: 'recorded only; no subprocess or checkout writes', multiplicity: 'once per config upgrade; two manifests produce two refreshes' }));
+// The pinned executor and minimatch select actual returned artifacts from in-memory dirty files.
+// Measured fixture input models the Bun preset migration and preserves the existing CI filter.
+calls.length = 0;
+dirtyFiles = [...dirtyContents.keys()];
+const branch = generateBranchConfig([upgrade('@homeflare/config')]);
+branch.updatedPackageFiles = [{ path: 'package.json', type: 'modification' }];
+branch.updatedArtifacts = [];
+branch.artifactErrors = [];
+const selected = await executor.namespace.default(branch);
+try {
+  assert.equal(selected.artifactErrors.length, 0);
+  assert.deepEqual(calls, [task.commands[0]]);
+  const expected = ['.github/workflows/ci.yml', 'bunfig.toml'];
+  assert.deepEqual(selected.updatedArtifacts.map(file => file.path).sort(), expected);
+  assert.deepEqual(reads.sort(), expected);
+  for (const artifact of selected.updatedArtifacts) {
+    assert.equal(artifact.type, 'addition');
+    assert.deepEqual(artifact.contents, dirtyContents.get(artifact.path));
+  }
+  console.log('PASS artifact selection: bunfig and existing CI file included; unrelated sentinel excluded');
+} catch (error) {
+  failures++;
+  console.error('FAIL artifact selection: ' + error.message);
+}
+console.log(JSON.stringify({ version, cases: cases.length + 1, failures, commandExecution: 'recorded only; no subprocess or checkout writes', multiplicity: 'once per config upgrade; two manifests produce two refreshes' }));
 process.exitCode = failures ? 1 : 0;
